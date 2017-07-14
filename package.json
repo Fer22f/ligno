@@ -1,9 +1,10 @@
 {
   "name": "ligno",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Material Design inspired components",
   "author": "fer22f <fer22f@gmail.com>",
-  "private": true,
+  "private": false,
+  "license": "MIT",
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "node build/dev-server.js",
