@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import App from './App'
+import Ligno from '../src'
+
+Vue.use(Ligno)
 
 Vue.config.productionTip = false
 
