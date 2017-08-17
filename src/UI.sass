@@ -1,0 +1,202 @@
+@import 'colors';
+@import 'mixins';
+
+*, :before, :after
+  :box-sizing border-box
+
+.bar
+  :display flex
+  :position relative
+
+.bar:before, .bar:after
+  :content ''
+  :height 2px
+  :width 0
+  :bottom 1px
+  :position absolute
+  :background $main
+  :transition 0.2s ease all
+
+.bar:before
+  :left 50%
+
+.bar:after
+  :right 50%
+
+.star
+  :margin-left 3px
+  :color $error
+
+.arrow
+  :width 0
+  :height 0
+  :border-left 6px solid transparent
+  :border-right 6px solid transparent
+  :border-top 7px solid #444
+  :margin 0 0 0 8px
+
+td .arrow
+  :border-left 5px solid transparent
+  :border-right 5px solid transparent
+  :border-top 5px solid rgba(0,0,0,.54)
+
+.errinput
+  :display flex
+  :flex-flow column
+  :position relative
+  :margin-top 16px
+  :flex 1
+  &.nolabel
+    :margin 0
+
+  input, textarea
+    :display flex
+    :flex 1
+    :font-size 16px
+    :padding 2px
+    :border none
+    :border-bottom 2px solid $inactive
+    :box-shadow none // Red outline on invalid on Firefox
+    :outline 0
+    :font-family Roboto, Arial, Helvetica
+    :background transparent
+  input
+    :line-height 26px
+    :min-height 32px
+  textarea
+    :resize none
+    :min-width 100%
+
+  label
+    :color $label
+    :font-size 14px
+    :font-weight normal
+    :position absolute
+    :pointer-events none
+    :top 8px
+    :left 2px
+    :height 16px
+    :transition 0.2s ease all
+
+  input:focus, input.filled, textarea:focus, textarea.filled
+    ~ label
+      :top -16px
+      :font-size 12px
+      :color $main
+
+  input:focus, textarea:focus
+    @include toggle-bar-focus
+
+  input:invalid.touched, input.error.touched,
+  textarea:invalid.touched, textarea.error.touched
+    :border-color $error
+    ~ label
+      :color $error
+    ~ .bar:before, ~ .bar:after
+      :background $error
+    ~ .helper > .error
+      display: block
+
+  .helper
+    :padding 2px 2px
+    :height 24px
+    :display flex
+    :font-size 12px
+
+  span.error
+    :color $error
+    :display none
+
+  .length
+    :color rgb(150, 150, 150)
+
+.datatable .invalid td
+  :color #f00
+
+.searchtable
+  :display flex
+  :flex-flow column
+  :flex 1
+  :overflow-y auto
+  .search-form
+    :padding 8px
+    :display flex
+    :flex-flow row
+    :align-items center
+  .search-form > *:not(.textbutton):not(.divider):not(.checkbox)
+    :flex 1
+  .search-form > *:not(.checkbox)
+    :padding 8px
+  .search-form > .textbutton
+    :align-self stretch
+  .process-form
+    :flex-flow column
+    :display flex
+    :flex 1
+    :overflow-y auto
+
+  .datatable
+    :flex 1
+  .checkdropdown .value
+    :color #999
+    :font-size 12px
+  td
+    :width 1px
+    :white-space nowrap
+    > .tabletextbox textarea
+      :width 120px
+
+.bottom
+  :display flex
+  :flex-flow row
+  :align-items center
+
+.bottom > div
+  :margin 6px 16px
+  :font-size 14px
+
+.bottom .textbutton
+  :margin 6px 8px
+  :color $main
+  :padding 0 6px
+.textbutton.red
+  :color #f44336
+.red
+  :color #f44336
+
+.spacer
+  :flex 1
+
+.fade-enter-active, .fade-leave-active
+  :transition opacity .2s
+
+.fade-enter, .fade-leave-to
+  :opacity 0
+
+.dividerh
+  :padding 0 !important
+  :margin 0 16px
+  :border-top 1px
+  :border-top-style solid
+  :border-top-color rgba(0, 0, 0, 0.12)
+
+button.circle
+  :background-color transparent
+  :border none
+  :outline 0
+  :cursor pointer
+  :border-radius 50%
+  :padding 8px !important
+  :width 40px
+  :height 40px
+
+button.circle:disabled
+  :pointer-events none
+  :fill rgba(0,0,0,0.38)
+
+button.circle:focus
+  :outline 0
+  :background-color rgba(0,0,0,.1)
+
+button.circle::-moz-focus-inner
+  :border 0

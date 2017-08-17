@@ -1,0 +1,21 @@
+@mixin toggle-bar-focus
+  ~ .bar:before, ~ .bar:after
+    :width 50%
+
+@mixin visually-hidden
+  :border 0
+  :clip rect(0 0 0 0)
+  :height 1px
+  :margin -1px
+  :overflow hidden
+  :padding 0
+  :position absolute
+  :text-transform none
+  :width 1px
+
+@mixin two-colors($rule, $selector, $first, $second)
+  #{$selector}
+    :#{$rule} $first
+  .second #{$selector}
+    :#{$rule} $second
+

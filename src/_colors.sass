@@ -1,0 +1,53 @@
+:$indigo-50  #e8eaf6
+:$indigo-100 #c5cae9
+:$indigo-200 #9fa8da
+:$indigo-300 #7986cb
+:$indigo-400 #5c6bc0
+:$indigo-500 #3f51b5
+:$indigo-600 #3949ab
+:$indigo-700 #303f9f
+:$indigo-800 #283593
+:$indigo-900 #1a237e
+
+:$blue-500 #2196f3
+:$blue-50  #e3f2fd
+:$blue-100 #bbdefb
+:$blue-200 #90caf9
+:$blue-300 #64b5f6
+:$blue-400 #42a5f5
+:$blue-500 #2196f3
+:$blue-600 #1e88e5
+:$blue-700 #1976d2
+:$blue-800 #1565c0
+
+:$teal-500 #009688
+:$teal-100 #b2dfdb
+:$teal-300 #4db6ac
+:$teal-400 #26a69a
+:$teal-700 #00796b
+
+:$inactive #E8E8E8
+:$label #999
+:$error #f44336
+:$main #5264AE
+:$hover #EEEEEE
+
+// Picker
+:$primary $indigo-300
+:$primary-light $indigo-100
+:$primary-strong $indigo-500
+:$secondary $teal-300
+:$secondary-light $teal-100
+:$secondary-strong $teal-400
+
+@function blend-normal ($foreground, $background)
+  $opacity: opacity($foreground)
+  $background-opacity: opacity($background)
+
+  $bm-red: red($foreground) * $opacity + red($background) * $background-opacity * (1 - $opacity)
+  $bm-green: green($foreground) * $opacity + green($background) * $background-opacity * (1 - $opacity)
+  $bm-blue: blue($foreground) * $opacity + blue($background) * $background-opacity * (1 - $opacity)
+  @return rgb($bm-red, $bm-green, $bm-blue)
+
+@function blend-black ($background, $amount)
+  @return blend-normal(rgba(0, 0, 0, $amount / 100), $background)
