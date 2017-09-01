@@ -18,7 +18,7 @@ export default {
 
       let firstInvalid
 
-      if (this.$el.form.id) {
+      if (this.$el.form && this.$el.form.id) {
         firstInvalid = document.querySelector(
           `[form=${this.$el.form.id}]:invalid, #${this.$el.form.id} [form='']:invalid`)
       } else {
@@ -39,6 +39,10 @@ export default {
 $main: #26a69a
 
 button.textbutton
+  :display flex
+  :flex-flow row
+  :justify-content center
+  :align-items center
   :border none
   :outline 0
   :background-color #FFF
