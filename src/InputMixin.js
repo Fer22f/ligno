@@ -7,7 +7,7 @@ export default {
     required: Boolean,
     errorMessage: String,
     errorFunction: { type: Function, default: x => null },
-    focus: Boolean,
+    focusOnMount: Boolean,
     disabled: Boolean
   },
   data () {
@@ -25,8 +25,9 @@ export default {
       set (value: string) { return this.$refs.input.setCustomValidity(value) }
     }
   },
-  mounted () { this.focus && this.$refs.input.focus() },
+  mounted () { this.focusOnMount && this.$refs.input.focus() },
   methods: {
+    focus () { this.$refs.input.focus() },
     inputOnInput (value: Object) {
       let error = this.errorFunction(value)
       if (error) {
