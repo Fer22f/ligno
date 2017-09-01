@@ -22,7 +22,8 @@ import DynamicList from './DynamicList'
 import OverlayDialog from './OverlayDialog'
 import Tooltip from './Tooltip'
 
-import './directives/waves'
+import Waves from './directives/waves'
+import DomBus from './services/domBus'
 
 export default {
   install (Vue: Vue) {
@@ -46,5 +47,11 @@ export default {
     }).forEach(([key, value]) => {
       Vue.component(key, value)
     })
+
+    Vue.prototype.$tooltip = _ => DomBus.$emit('tooltip', _)
+
+    Waves.install(Vue)
   }
 }
+
+export { DomBus }
