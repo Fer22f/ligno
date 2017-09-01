@@ -4,6 +4,7 @@ mixin input(tag)
   :disabled="disabled" :maxlength="maxlength" ref="input"
   :type="type" :autocomplete="autocomplete" @blur="inputOnBlur"
   :class="{ touched, filled: value, error: temporaryError }"
+  :pattern="pattern"
   @invalid.prevent="inputOnInvalid" @input="onInput" @focus="inputOnFocus"
   @keydown="onKeyDown")&attributes(attributes)
 
@@ -35,7 +36,8 @@ export default {
     autocomplete: { type: String, default: 'on' },
     multiline: Boolean,
     rows: Number,
-    hideHelper: Boolean
+    hideHelper: Boolean,
+    pattern: String
   },
   watch: {
     value (value: String) { this.inputOnInput(value) }
