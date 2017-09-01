@@ -23,7 +23,7 @@ export default {
   mixins: [InputMixin],
   props: {
     value: [String, Number],
-    type: { type: String }
+    type: String
   },
   computed: {
     formattedValue () { return this.value ? currency(this.value) : 'R$ 0,00' }
