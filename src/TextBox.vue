@@ -3,7 +3,7 @@ mixin input(tag)
   #{tag}(:name="name" :value="value" :required="required"
   :disabled="disabled" :maxlength="maxlength" ref="input"
   :type="type" :autocomplete="autocomplete" @blur="inputOnBlur"
-  :class="{ touched, filled: value, error: temporaryError }"
+  :class="{ touched, filled: value || fakeFilled, error: temporaryError }"
   :pattern="pattern"
   @invalid.prevent="inputOnInvalid" @input="onInput" @focus="inputOnFocus"
   @keydown="onKeyDown")&attributes(attributes)

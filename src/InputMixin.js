@@ -13,10 +13,10 @@ export default {
   data () {
     return {
       validationMessage: requiredMessage,
-      active: false,
       touched: false,
       // Flag for temporary error
-      temporaryError: false
+      temporaryError: false,
+      fakeFilled: false
     }
   },
   computed: {
@@ -25,7 +25,10 @@ export default {
       set (value: string) { return this.$refs.input.setCustomValidity(value) }
     }
   },
-  mounted () { this.focusOnMount && this.$refs.input.focus() },
+  mounted () {
+    this.focusOnMount && this.focus()
+    this.inputOnInput(this.value)
+  },
   methods: {
     focus () { this.$refs.input.focus() },
     inputOnInput (value: Object) {
@@ -40,11 +43,11 @@ export default {
       this.temporaryError = false
     },
     inputOnBlur () {
-      this.active && (this.touched = true)
-      this.active = false
+      this.touched = true
+      this.$emit('blur')
     },
     inputOnFocus () {
-      this.active = true
+      this.$emit('focus')
     },
     inputOnInvalid () {
       let error = this.errorFunction(this.value)
