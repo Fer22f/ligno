@@ -33,8 +33,10 @@
             span.sortarrow(v-if="currentSort.replace('-', '') === column.sort")
           th.arrow-cell(v-if="$scopedSlots.expand")
       tbody(ref="tbody")
-        template(v-for="(row, index) in value")
-          tr(:class="[{ checked: row.state_ === 1, clickable: $scopedSlots.expand }, classList(row)]"
+        tr.filler(:style="topItemStyle")
+        template(v-for="(row, index) in visibleItems")
+          tr(:class="[{ checked: row.state_ === 1, " +
+          "clickable: $scopedSlots.expand }, classList(row)]"
           @click="onRowClick($event, row)")
             td.checkbox-cell(@click.stop v-if="selectionMode")
               checkbox(:value="row.state_" @mouseup="onMouseUp"
@@ -45,6 +47,7 @@
               .arrow.down(:class="expandedRow === row && 'inverted'")
           tr(v-if="expandedRow === row").expando
             slot(:row="row" name="expand")
+        tr.filler(:style="bottomItemStyle")
 </template>
 
 <script>
@@ -58,7 +61,8 @@ export default {
     selected: { type: Array, default: Array },
     progress: Boolean,
     reorder: Function,
-    selectionMode: { type: Boolean, default: true }
+    selectionMode: { type: Boolean, default: true },
+    itemHeight: { type: Number, default: 48 }
   },
   watch: {
     selected (value : Array<Object>, oldValue : Array<Object>) {
@@ -84,9 +88,10 @@ export default {
       this.$emit('select', newList)
 
       if (value.length) {
-        this.$nextTick(this.calculateStyles.bind(this))
+        this.adjustTable()
+        this.$nextTick(this.adjustTable.bind(this))
         this.$domBus.$off('resize')
-        this.$domBus.$on('resize', this.calculateStyles.bind(this))
+        this.$domBus.$on('resize', this.adjustTable.bind(this))
       }
     }
   },
@@ -105,8 +110,84 @@ export default {
     }
   },
   methods: {
-    onScroll ({ target }: window.HTMLEvent) {
-      this.scrollTop = target.scrollTop
+    adjustHeaderWidths () {
+      const { tbody } = this.$refs
+      const bodyTds = [...tbody.querySelector('tr:not(.filler)').querySelectorAll('td')]
+      const boxes = bodyTds.map(element => element.getBoundingClientRect())
+      if (!boxes.length || boxes[0].width === 0) { return }
+      this.headersWidth = (this.selectionMode ? [] : [0])
+        .concat(boxes.map(x => x.width + 'px'))
+    },
+    async updateVisibleItems (scroll: { top: number, bottom: number, height: number }) {
+      const { scrollContainer } = this.$refs
+
+      const extra = Math.floor(scroll.height / this.itemHeight) * 2
+      let startIndex = Math.max(Math.floor(scroll.top / this.itemHeight) - extra, 0)
+      let endIndex = Math.min(Math.floor(scroll.bottom / this.itemHeight) + extra,
+        this.value.length)
+
+      this.visibleItems = this.value.slice(startIndex, endIndex)
+      this.previousStart = startIndex
+      this.previousEnd = endIndex
+
+      this.topItemStyle = {
+        height: `${startIndex * this.itemHeight}px`
+      }
+      this.bottomItemStyle = {
+        height: `${(this.value.length - endIndex) * this.itemHeight}px`
+      }
+
+      await this.$nextTick()
+
+      if (scrollContainer.scrollTop !== scroll.top) {
+        scrollContainer.scrollTop = scroll.top
+      }
+    },
+    async adjustTable () {
+      const { scrollContainer } = this.$refs
+
+      // This causes reflows, caution!
+      const scroll = {
+        top: scrollContainer.scrollTop,
+        bottom: scrollContainer.scrollTop + scrollContainer.clientHeight,
+        height: scrollContainer.clientHeight
+      }
+
+      await this.updateVisibleItems(scroll)
+      this.adjustHeaderWidths()
+    },
+    onScroll (event: window.HTMLEvent) {
+      if (this.scrollTimeout) {
+        clearTimeout(this.scrollTimeout)
+      }
+
+      if (this.headerTimeout) {
+        clearTimeout(this.headerTimeout)
+      }
+
+      const { scrollContainer } = this.$refs
+      const scroll = {
+        top: scrollContainer.scrollTop,
+        bottom: scrollContainer.scrollTop + scrollContainer.clientHeight,
+        height: scrollContainer.clientHeight
+      }
+
+      const extra = Math.floor(scroll.height / this.itemHeight / 2)
+
+      let startIndex = Math.max(Math.floor(scroll.top / this.itemHeight) - extra, 0)
+      let endIndex = Math.min(Math.floor(scroll.bottom / this.itemHeight) + extra,
+        this.value.length)
+
+      if (startIndex < this.previousStart || endIndex > this.previousEnd) {
+        // Urgent, there's nothing showing on the screen!
+        this.updateVisibleItems(scroll)
+      } else {
+        this.scrollTimeout = setTimeout(this.adjustTable, 40)
+      }
+
+      this.headerTimeout = setTimeout(this.adjustHeaderWidths, 100)
+
+      this.scrollTop = event.target.scrollTop
     },
     onColumnClick (event: window.HTMLEvent, order: string) {
       if (order === this.currentSort) {
@@ -114,8 +195,8 @@ export default {
       } else {
         this.currentSort = order
       }
-      this.$nextTick(this.calculateStyles.bind(this))
 
+      this.$nextTick(this.adjustTable.bind(this))
       this.reorder(event, this.currentSort)
     },
     onRowClick (event: window.HTMLEvent, row: Object) {
@@ -128,15 +209,7 @@ export default {
         this.expandedRow = row
       }
 
-      this.$nextTick(this.calculateStyles.bind(this))
-    },
-    calculateStyles () {
-      const { tbody } = this.$refs
-      const bodyTds = [...tbody.querySelector('tr').querySelectorAll('td')]
-      const boxes = bodyTds.map(element => element.getBoundingClientRect())
-      if (boxes[0].width === 0) { return }
-      this.headersWidth = (this.selectionMode ? [] : [0])
-        .concat(boxes.map(x => x.width + 'px'))
+      this.$nextTick(this.adjustTable.bind(this))
     },
     getKey (row: Object) {
       return this.trackBy instanceof Function
@@ -178,7 +251,10 @@ export default {
       headersWidth: [],
       currentSort: '',
       scrollTop: 0,
-      expandedRow: null
+      expandedRow: null,
+      visibleItems: [],
+      bottomItemStyle: '',
+      topItemStyle: ''
     }
   },
   activated () {
@@ -200,7 +276,6 @@ $selected: #eeeeee
 
   table
     :border-collapse collapse
-    :flex 1
     :width 100%
 
   thead, thead > tr
@@ -216,6 +291,9 @@ $selected: #eeeeee
     :border 0 solid $division
     :border-bottom-width 1px
     :transition background-color .2s
+  tr.filler
+    :border 0
+    :height 0
   tbody
     > tr.checked
       background: $selected !important
@@ -253,6 +331,7 @@ $selected: #eeeeee
 
   .tbody-container
     :overflow auto
+    :flex 1
     > table
       :margin-top -49px
 
