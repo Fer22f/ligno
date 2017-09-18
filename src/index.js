@@ -19,6 +19,8 @@ import TableTextBox from './TableTextBox'
 import TableExtraItems from './TableExtraItems'
 import DynamicList from './DynamicList'
 
+import Grouper from './Grouper'
+
 import OverlayDialog from './OverlayDialog'
 import Tooltip from './Tooltip'
 
@@ -43,12 +45,14 @@ export default {
       DynamicList,
       AutoComplete,
       BoletoTextBox,
-      Tooltip
+      Tooltip,
+      Grouper
     }).forEach(([key, value]) => {
       Vue.component(key, value)
     })
 
     Vue.prototype.$tooltip = _ => DomBus.$emit('tooltip', _)
+    Vue.prototype.$domBus = DomBus
 
     Waves.install(Vue)
   }
