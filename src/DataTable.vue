@@ -87,12 +87,10 @@ export default {
 
       this.$emit('select', newList)
 
-      if (value.length) {
-        this.adjustTable()
-        this.$nextTick(this.adjustTable.bind(this))
-        this.$domBus.$off('resize')
-        this.$domBus.$on('resize', this.adjustTable.bind(this))
-      }
+      this.adjustTable()
+      this.$nextTick(this.adjustTable.bind(this))
+      this.$domBus.$off('resize')
+      this.$domBus.$on('resize', this.adjustTable.bind(this))
     }
   },
   computed: {
@@ -112,7 +110,9 @@ export default {
   methods: {
     adjustHeaderWidths () {
       const { tbody } = this.$refs
-      const bodyTds = [...tbody.querySelector('tr:not(.filler)').querySelectorAll('td')]
+      const firstRow = tbody.querySelector('tr:not(.filler)')
+      if (!firstRow) { return }
+      const bodyTds = [...firstRow.querySelectorAll('td')]
       const boxes = bodyTds.map(element => element.getBoundingClientRect())
       if (!boxes.length || boxes[0].width === 0) { return }
       this.headersWidth = (this.selectionMode ? [] : [0])
